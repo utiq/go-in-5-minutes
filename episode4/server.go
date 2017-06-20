@@ -3,23 +3,17 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
-	"text/template"
+	"github.com/gin-gonic/gin"
 )
 
-func homeHandler(tpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tpl.Execute(w, r)
-	})
-}
-
 func main() {
+	r := gin.New()
+
+  r.Use(gin.Logger())
+  r.Use(gin.Recovery())
+
 	flag.Parse()
-	tpl := template.Must(template.ParseFiles("index.html"))
-	h := newHub()
-	router := http.NewServeMux()
-	router.Handle("/", homeHandler(tpl))
-	router.Handle("/ws", wsHandler{h: h})
+	r.GET("/ws", stream)
 	log.Printf("serving on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	r.Run(":8080")
 }
