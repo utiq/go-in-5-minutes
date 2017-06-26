@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"github.com/gin-gonic/gin"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -21,7 +21,7 @@ func (c *connection) reader(wg *sync.WaitGroup, wsConn *websocket.Conn) {
 	for {
 		_, message, err := wsConn.ReadMessage()
 		log.Println("reader")
-    log.Println(message)
+		log.Println(message)
 		if err != nil {
 			break
 		}
@@ -34,7 +34,7 @@ func (c *connection) writer(wg *sync.WaitGroup, wsConn *websocket.Conn) {
 	for message := range c.send {
 		err := wsConn.WriteMessage(websocket.TextMessage, message)
 		log.Println("writer")
-    log.Println(message)
+		log.Println(message)
 		if err != nil {
 			break
 		}
@@ -42,16 +42,11 @@ func (c *connection) writer(wg *sync.WaitGroup, wsConn *websocket.Conn) {
 }
 
 var upgrader = &websocket.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
-    CheckOrigin: func(r *http.Request) bool {
-        return true
-    },
-}
-
-func stream (c *gin.Context) {
-  h := newHub()
-	wsHandler{h: h}.ServeHTTP(c.Writer, c.Request)
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 type wsHandler struct {
